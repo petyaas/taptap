@@ -31,6 +31,8 @@ class _FloatWidgetState extends State<FloatWidget> {
 
     });
   }
+
+
   @override
   Widget build(BuildContext context) {
     final isPortrait = MediaQuery.of(widget.mainContext).orientation == Orientation.portrait;

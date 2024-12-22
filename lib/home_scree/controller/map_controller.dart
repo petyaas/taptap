@@ -20,22 +20,26 @@ class MapControllerX extends GetxController {
     // TODO: implement onInit
     super.onInit();
   }
-
+   /// Set map location
    void setMapLoc(LatLng location){
     mapLat.value=location.latitude;
     mapLon.value=location.longitude;
   }
 
+   /// Set user Location from gps
   void setUserLoc(LatLng location){
     userLat.value=location.latitude;
     userLon.value=location.longitude;
   }
 
-  void addPoint(String name){
+   /// add favorite point
+   void addPoint(String name){
     points.add(PointModel(name: name,lat: mapLat.value, lon: mapLon.value));
     PointStorage().setPointModel(points);
     getPoints();
   }
+
+  ///search from fav point
   List<PointModel> searchFromPoints({String text = ''}){
     List<PointModel> _temp=[];
     points.forEach((point){
@@ -46,6 +50,8 @@ class MapControllerX extends GetxController {
     });
     return _temp;
   }
+
+   ///get from fav point
   void getPoints()async{
     allMarkers.clear();
 
