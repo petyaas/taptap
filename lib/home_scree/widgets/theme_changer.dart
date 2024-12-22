@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 enum Theme { light, dark,}
 class MultipleChoice extends StatefulWidget {
-   const MultipleChoice({super.key,required this.onChange});
+   const MultipleChoice({super.key,required this.onChange,required this.currentTheme});
+   final bool currentTheme;
 
    final Function(bool) onChange;
 
@@ -11,7 +12,13 @@ class MultipleChoice extends StatefulWidget {
 
 class _MultipleChoiceState extends State<MultipleChoice> {
   Set<Theme> selection = <Theme>{Theme.light};
-
+@override
+  void initState() {
+  if(widget.currentTheme){selection=<Theme>{Theme.light};}
+  else{selection=<Theme>{Theme.dark};}
+    // TODO: implement initState
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return SegmentedButton<Theme>(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:taptap/home_scree/widgets/drawer.dart';
 import 'package:taptap/service/geolocator.dart';
 import 'package:taptap/theme/theme_controller.dart';
 
@@ -17,32 +18,27 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin{
+class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   final mapState = Get.put(MapControllerX());
 
-  bool _startMoveCamera=false;
+  bool _startMoveCamera = false;
   final mapController = MapController();
   final locationController = CurrentLocationMarkerController();
-  bool mapControllerInited=false;
+  bool mapControllerInited = false;
   static const _startedId = 'AnimatedMapController#MoveStarted';
   static const _inProgressId = 'AnimatedMapController#MoveInProgress';
   static const _finishedId = 'AnimatedMapController#MoveFinished';
 
   void _animatedMapMove(LatLng destLocation, double destZoom) {
     final camera = mapController.camera;
-    final latTween = Tween<double>(
-        begin: camera.center.latitude, end: destLocation.latitude);
-    final lngTween = Tween<double>(
-        begin: camera.center.longitude, end: destLocation.longitude);
+    final latTween = Tween<double>(begin: camera.center.latitude, end: destLocation.latitude);
+    final lngTween = Tween<double>(begin: camera.center.longitude, end: destLocation.longitude);
     final zoomTween = Tween<double>(begin: camera.zoom, end: destZoom);
 
-    final controller = AnimationController(
-        duration: const Duration(milliseconds: 3000), vsync: this);
-    final Animation<double> animation =
-    CurvedAnimation(parent: controller, curve: Curves.fastOutSlowIn);
+    final controller = AnimationController(duration: const Duration(milliseconds: 3000), vsync: this);
+    final Animation<double> animation = CurvedAnimation(parent: controller, curve: Curves.fastOutSlowIn);
 
-    final startIdWithTarget =
-        '$_startedId#${destLocation.latitude},${destLocation.longitude},$destZoom';
+    final startIdWithTarget = '$_startedId#${destLocation.latitude},${destLocation.longitude},$destZoom';
     bool hasTriggeredMove = false;
 
     controller.addListener(() {
@@ -77,44 +73,37 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin{
   Widget build(BuildContext context) {
     return SafeArea(
       top: false,
-        bottom: false,
-        child:
-    Scaffold(
-      body:
-      Stack(
-        children: [
-          Obx((){
-            return
-              FlutterMap(
+      bottom: false,
+      child: Scaffold(
+        drawer: MainDrawer(),
+        body: Stack(
+          children: [
+            Obx(() {
+              return FlutterMap(
                 // mapController: mapController,
                 mapController: mapController,
 
-                options:MapOptions(
+                options: MapOptions(
                   initialCenter: const LatLng(51.5, -0.09),
                   initialZoom: 3,
-                  onMapReady: ()async{
-
+                  onMapReady: () async {
                     mapState.setUserLoc(await getLocation());
-                    // _animatedMapMove(LatLng(mapState.userLat.value, mapState.userLon.value),15);
-                    mapControllerInited=true;
-                    mapController.move(LatLng(mapState.userLat.value, mapState.userLon.value), 15);
-
-
-
+                    _animatedMapMove(LatLng(mapState.userLat.value, mapState.userLon.value), 15);
+                    mapControllerInited = true;
+                    // mapController.move(LatLng(mapState.userLat.value, mapState.userLon.value), 15);
                   },
-                  onPositionChanged: (MapPosition, bool){
-                    if(_startMoveCamera){
+                  onPositionChanged: (MapPosition, bool) {
+                    if (_startMoveCamera) {
                       mapState.setMapLoc(mapController.camera.center);
                     }
                   },
-                  onPointerDown: (PointerDownEvent, LatLng){
-                    _startMoveCamera=true;
+                  onPointerDown: (PointerDownEvent, LatLng) {
+                    _startMoveCamera = true;
                     locationController.up();
                   },
-                  onPointerUp: (PointerUpEvent, LatLng){
+                  onPointerUp: (PointerUpEvent, LatLng) {
                     locationController.down();
                   },
-
                   cameraConstraint: CameraConstraint.contain(
                     bounds: LatLngBounds(
                       const LatLng(-90, -180),
@@ -122,99 +111,172 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin{
                     ),
                   ),
                 ),
-                children:
-                [
+                children: [
                   TileLayer(
                     urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                     userAgentPackageName: 'com.taptap.app',
-                    tileBuilder:Get.find<ThemeCOntroller>().isLightTheme.value==false? (
-                        BuildContext context,
-                        Widget tileWidget,
-                        TileImage tile,
-                        ) {
-
-                      return ColorFiltered(
-                        colorFilter: const ColorFilter.matrix(<double>[
-                          -0.2126, -0.7152, -0.0722, 0, 255, // Red channel
-                          -0.2126, -0.7152, -0.0722, 0, 255, // Green channel
-                          -0.2126, -0.7152, -0.0722, 0, 255, // Blue channel
-                          0,       0,       0,       1, 0,   // Alpha channel
-                        ]),
-                        child: tileWidget,
-                      );
-                    }:null,
-
+                    tileBuilder: Get.find<ThemeCOntroller>().isLightTheme.value == false
+                        ? (
+                            BuildContext context,
+                            Widget tileWidget,
+                            TileImage tile,
+                          ) {
+                            return ColorFiltered(
+                              colorFilter: const ColorFilter.matrix(<double>[
+                                -0.2126, -0.7152, -0.0722, 0, 255, // Red channel
+                                -0.2126, -0.7152, -0.0722, 0, 255, // Green channel
+                                -0.2126, -0.7152, -0.0722, 0, 255, // Blue channel
+                                0, 0, 0, 1, 0, // Alpha channel
+                              ]),
+                              child: tileWidget,
+                            );
+                          }
+                        : null,
                   ),
-
                   MarkerLayer(
-                    markers: [
-                      if(mapState.userLat.value!=0.0)
-                      Marker(
-                        point: LatLng(mapState.userLat.value, mapState.userLon.value),
-                        width: 80,
-                        rotate: true,
-                        height: 80,
-                        child: const Icon(Icons.person,size: 30,),
-                      ),
-                      if(mapState.mapLat.value!=0.0)
-                      Marker(
-                        point: LatLng(mapState.mapLat.value, mapState.mapLon.value),
-                        width: 80,
-                        rotate: true,
-                        height: 80,
-                        child: CurrentLocationMarker(controller: locationController,),
-                      ),
-                    ],
+                    markers: mapState.allMarkers,
+                    // if (mapState.mapLat.value != 0.0)
+                    //   Marker(
+                    //     point: LatLng(mapState.mapLat.value, mapState.mapLon.value),
+                    //     width: 80,
+                    //     rotate: true,
+                    //     height: 80,
+                    //     child: InkWell(
+                    //         onTap: () {
+                    //           showModalBottomSheet<void>(
+                    //             context: context,
+                    //             isScrollControlled: true,
+                    //             builder: (BuildContext context) {
+                    //               TextEditingController controller=TextEditingController();
+                    //               return SingleChildScrollView(
+                    //                   padding:
+                    //                   EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+                    //                   child: Container(
+                    //                     height: 150,
+                    //                       child: Padding(
+                    //                         padding: const EdgeInsets.all(8.0),
+                    //                         child: Column(
+                    //                           crossAxisAlignment: CrossAxisAlignment.stretch,
+                    //                           children: [
+                    //                              TextField(
+                    //                         controller: controller,
+                    //                               decoration: InputDecoration(
+                    //                                 hintText: 'Name'
+                    //                               ),
+                    //                             ),
+                    //                             ElevatedButton(
+                    //                                 onPressed: (){
+                    //                                   if(controller.text.isNotEmpty){
+                    //                                     mapState.addPoint(controller.text);
+                    //                                   }
+                    //                                   Navigator.pop(context);
+                    //                                 }, child: Text('Add Point')
+                    //                             ),
+                    //                           ],
+                    //                         ),
+                    //                       ))
+                    //               );;
+                    //             },
+                    //           );
+                    //           // mapState.addPoint(LatLng(mapState.mapLat.value, mapState.mapLon.value), 'name');
+                    //         },
+                    //         child: CurrentLocationMarker(
+                    //           controller: locationController,
+                    //         )),
+                    //   ),
+                    // mapState.allMarkers.toSet(),
                   ),
                 ],
-
               );
-          }),
+            }),
+                 Obx((){
+                   if (mapState.mapLat.value != 0.0){
+                     return
+                       Center(
+                         child: Container(
+                           width: 50,
+                           child: InkWell(
+                               onTap: () {
+                                 showModalBottomSheet<void>(
+                                   context: context,
+                                   isScrollControlled: true,
+                                   builder: (BuildContext context) {
+                                     TextEditingController controller=TextEditingController();
+                                     return SingleChildScrollView(
+                                         padding:
+                                         EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+                                         child: Container(
+                                             height: 150,
+                                             child: Padding(
+                                               padding: const EdgeInsets.all(8.0),
+                                               child: Column(
+                                                 crossAxisAlignment: CrossAxisAlignment.stretch,
+                                                 children: [
+                                                   TextField(
+                                                     controller: controller,
+                                                     decoration: InputDecoration(
+                                                         hintText: 'Name'
+                                                     ),
+                                                   ),
+                                                   ElevatedButton(
+                                                       onPressed: (){
+                                                         if(controller.text.isNotEmpty){
+                                                           mapState.addPoint(controller.text);
+                                                         }
+                                                         Navigator.pop(context);
+                                                       }, child: Text('Add Point')
+                                                   ),
+                                                 ],
+                                               ),
+                                             ))
+                                     );;
+                                   },
+                                 );
+                                 // mapState.addPoint(LatLng(mapState.mapLat.value, mapState.mapLon.value), 'name');
+                               },
+                               child: CurrentLocationMarker(
+                                 controller: locationController,
+                               )),
+                         ),
+                       );
 
-          buildFloatingSearchBar(context),
+                   }
+                   else return Container();
 
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Align(
-              alignment: Alignment.bottomLeft,
-                child: MultipleChoice(onChange: (theme ) {
-                  print(theme);
-                  if (theme) {
-                    Get.find<ThemeCOntroller>().changeTheme(true);
-                  } else {
-                    Get.find<ThemeCOntroller>().changeTheme(false);
-                  }
-                },)
-            ),
-  ),
-          // Column(children: [
-          //   ElevatedButton(onPressed: (){}, child: Text('adasas'),),
-          //   ElevatedButton(onPressed: (){}, child: Text('adasas'),),
-          //   ElevatedButton(onPressed: (){}, child: Text('adasas'),),
-          //   ElevatedButton(onPressed: (){
-          //     locationController.down();
-          //
-          //   }, child: Text('adasas'),),
-          //   ElevatedButton(onPressed: (){
-          //     locationController.up();
-          //   }, child: Text('adasas'),),
-          // ],)
-        ],
+                 }),
+
+
+            FloatWidget(mainContext: context,onSelect: (point){
+              _animatedMapMove(LatLng(point.lat, point.lon), 15);
+
+            },),
+            // buildFloatingSearchBar(context),
+
+            // Column(children: [
+            //   ElevatedButton(onPressed: (){}, child: Text('adasas'),),
+            //   ElevatedButton(onPressed: (){}, child: Text('adasas'),),
+            //   ElevatedButton(onPressed: (){}, child: Text('adasas'),),
+            //   ElevatedButton(onPressed: (){
+            //     locationController.down();
+            //
+            //   }, child: Text('adasas'),),
+            //   ElevatedButton(onPressed: (){
+            //     locationController.up();
+            //   }, child: Text('adasas'),),
+            // ],)
+          ],
+        ),
+        floatingActionButton: FloatingActionButton(
+            onPressed: () async {
+              // print(await getLocation());
+              mapState.setUserLoc(await getLocation());
+              // mapController.move(LatLng(mapState.userLat.value, mapState.userLon.value), 15);
+              _animatedMapMove(LatLng(mapState.userLat.value, mapState.userLon.value), 15);
+
+              // mapState.setUserLoc(mapController.camera.center);
+            },
+            child: Icon(Icons.navigation)),
       ),
-      floatingActionButton: FloatingActionButton(
-
-          onPressed: ()async{
-            // print(await getLocation());
-            mapState.setUserLoc(await getLocation());
-            mapController.move(LatLng(mapState.userLat.value, mapState.userLon.value), 15);
-            // _animatedMapMove(LatLng(mapState.userLat.value, mapState.userLon.value),15);
-
-            // mapState.setUserLoc(mapController.camera.center);
-
-          }, child: Icon(Icons.navigation)
-      ),
-
-    ),
     );
   }
 }
