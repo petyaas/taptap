@@ -95,9 +95,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin{
                   onMapReady: ()async{
 
                     mapState.setUserLoc(await getLocation());
-                    _animatedMapMove(LatLng(mapState.userLat.value, mapState.userLon.value),15);
+                    // _animatedMapMove(LatLng(mapState.userLat.value, mapState.userLon.value),15);
                     mapControllerInited=true;
-                    // mapController.move(await getLocation(), 15);
+                    mapController.move(LatLng(mapState.userLat.value, mapState.userLon.value), 15);
 
 
 
@@ -206,8 +206,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin{
           onPressed: ()async{
             // print(await getLocation());
             mapState.setUserLoc(await getLocation());
-            // mapController.move(await getLocation(), 15);
-            _animatedMapMove(LatLng(mapState.userLat.value, mapState.userLon.value),15);
+            mapController.move(LatLng(mapState.userLat.value, mapState.userLon.value), 15);
+            // _animatedMapMove(LatLng(mapState.userLat.value, mapState.userLon.value),15);
 
             // mapState.setUserLoc(mapController.camera.center);
 
