@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:taptap/home_scree/widgets/theme_changer.dart';
 import 'package:get/get.dart';
 
+import '../../chat_gpt_screen/view/chat_ui.dart';
 import '../../theme/theme_controller.dart';
 class MainDrawer extends StatefulWidget {
   const MainDrawer({super.key});
@@ -21,7 +22,9 @@ class _MainDrawerState extends State<MainDrawer> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              ElevatedButton(onPressed: (){}, child: Text('Chat')),
+              ElevatedButton(onPressed: (){
+                Get.to(ChatUi());
+              }, child: Text('Chat')),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),

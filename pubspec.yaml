@@ -49,6 +49,8 @@ dependencies:
   #ui
   material_floating_search_bar_2: ^0.5.0
   flutter_svg: ^2.0.16
+  #chat
+  flutter_chat_ui: ^1.6.15
 
 
 dev_dependencies:
